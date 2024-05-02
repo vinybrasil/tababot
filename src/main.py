@@ -22,7 +22,7 @@ def healthcheck():
     return {"service": "tababot"}
 
 
-def ask_llm(request: Request):
+def ask_llm(request: Request) -> Request:
     try:
         res = chain.invoke(request.question)
         logging.info(f"Request {request.request_id}: success")

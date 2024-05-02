@@ -118,14 +118,10 @@ def create_model(retriever):
     return chain
 
 
-def build_dataset():
+
+def build_chain():
     texts, tables = read_pdf()
     retriever, id_key = load_vectorstore()
     add_raw_data(texts, tables, retriever, id_key)
-    return retriever
-
-
-def build_chain():
-    retriever = build_dataset()
     chain = create_model(retriever)
     return chain

@@ -58,14 +58,15 @@ There's still some problems with the response (the year is poorly formatted):
 * Answer: Segundo o texto, a Organização Mundial de Saúde (OMS) estimou que, caso não sejam adotadas medidas para o controle e cessação do tabagismo, haveriam aproximadamente 8 milhões de mortes em todo o mundo por doenças relacionadas ao tabaco no ano de 20[30].
 
 
-Since it only answers questions about tabacco, it cannot answer questions about creck, for example.
+Since it only answers questions about tabacco, it cannot answer questions about crack, for example.
 * Question: Como é classificado o crack?
 * Answer: Não tem dados disponíveis para responder essa pergunta. O texto não menciona o crack em nenhum momento, portanto não posso fornecer uma resposta com base nas informações fornecidas.
 
 TODO
 ---
+* Containerize with Docker
 * Handle stream response from Ollama
 * Use poetry for dependency management
 * Save the vectorstore and load it
 * Unit tests
-* Save to a database the requests and their status
+* Save to a database the requests and their statuses

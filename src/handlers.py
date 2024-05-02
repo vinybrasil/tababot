@@ -14,12 +14,13 @@ from unstructured.partition.pdf import partition_pdf
 
 from src.schemas import Element
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(asctime)s  - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(levelname)s - %(asctime)s  - %(message)s"
+)
 
 
-def build_dataset():
+def read_pdf():
     raw_pdf_elements = partition_pdf(
-        #filename="/home/vinybrasil/random_projects/llms/tutorial_chatbot/data/protocolo-clinico-e-diretrizes-terapeuticas-do-tabagismo.pdf",
         filename="utilities/protocolo-clinico-e-diretrizes-terapeuticas-do-tabagismo.pdf",
         extract_images_in_pdf=False,
         infer_table_structure=True,
@@ -28,7 +29,6 @@ def build_dataset():
         languages=["por"],
         max_characters=800,
         combine_text_under_n_chars=100,
-        #image_output_dir_path="/home/vinybrasil/random_projects/llms/tutorial_chatbot/data/",
     )
 
     category_counts = {}
@@ -43,23 +43,22 @@ def build_dataset():
     categorized_elements = []
     for element in raw_pdf_elements:
         if "unstructured.documents.elements.Table" in str(type(element)):
-            categorized_elements.append(Element(type="table", text=str(element)))
+            categorized_elements.append(Element(type="table", payload=str(element)))
         elif "unstructured.documents.elements.CompositeElement" in str(type(element)):
-            categorized_elements.append(Element(type="text", text=str(element)))
-
+            categorized_elements.append(Element(type="text", payload=str(element)))
 
     text_elements = [e for e in categorized_elements if e.type == "text"]
-    texts = [i.text for i in text_elements]
-    # print(len(table_elements))
-    logging.info(f'Number of text chunks found: {len(text_elements)}')
+    texts = [i.payload for i in text_elements]
+    logging.info(f"Number of text chunks found: {len(text_elements)}")
+
     table_elements = [e for e in categorized_elements if e.type == "table"]
-    tables = [i.text for i in table_elements]
-    logging.info(f'Number of tables chunks found: {len(text_elements)}')
+    tables = [i.payload for i in table_elements]
+    logging.info(f"Number of tables chunks found: {len(text_elements)}")
 
     return texts, tables
 
 
-def load_vectorstore(folder_path="db22"):
+def load_vectorstore():
     store = InMemoryStore()
     id_key = "doc_id"
 
@@ -67,7 +66,6 @@ def load_vectorstore(folder_path="db22"):
     vectorstore = Chroma(
         collection_name="summaries11",
         embedding_function=embedding,
-        #persist_directory=folder_path,
     )
 
     retriever = MultiVectorRetriever(
@@ -75,15 +73,6 @@ def load_vectorstore(folder_path="db22"):
         docstore=store,
         id_key=id_key,
     )
-
-    # breakpoint()
-    # retriever = vectorstore.as_retriever(
-    #     search_type="similarity_score_threshold",
-    #     search_kwargs={
-    #         "k":10,
-    #         "score_threshold": 0.5,
-    #     },
-    # )
 
     return retriever, id_key
 
@@ -129,9 +118,14 @@ def create_model(retriever):
     return chain
 
 
-def build_chain():
-    texts, tables = build_dataset()
+def build_dataset():
+    texts, tables = read_pdf()
     retriever, id_key = load_vectorstore()
     add_raw_data(texts, tables, retriever, id_key)
+    return retriever
+
+
+def build_chain():
+    retriever = build_dataset()
     chain = create_model(retriever)
     return chain

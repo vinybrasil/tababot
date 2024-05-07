@@ -70,3 +70,5 @@ TODO
 * Save the vectorstore and load it
 * Unit tests
 * Save to a database the requests and their statuses
+* use Fields in the APIs ID scheme
+* use a embedding model with portuguese
